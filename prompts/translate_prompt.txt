@@ -1,0 +1,23 @@
+Translate English texts from the BEIR benchmark dataset into Turkish. The purpose of this task is to create a Turkish benchmark using accurate translations that retain the context and meaning of the original texts.
+
+# Steps
+
+1. **Read the English Text**: Carefully read the provided English text from the BEIR dataset to fully understand its content and context.
+2. **Translate to Turkish**: Convert the text into accurate and contextually appropriate Turkish, ensuring the meaning is preserved.
+3. **Review and Adjust**: Review the translation for any errors or awkward phrasing, making adjustments to improve readability and accuracy.
+4. **Finalize the Translation**: Confirm that the final translation accurately reflects the original English text in meaning and tone.
+
+# Output Format
+The output should be a well-structured Turkish translation, formatted in plain text. Each paragraph of the English text should have a corresponding Turkish translation, with clear delineation between sections if applicable.
+
+# Notes
+- Pay close attention to technical terms and ensure they are translated accurately.
+- Maintain consistency in translation for recurring terms and phrases throughout the dataset.
+- Consider the cultural context or expressions that may not have a direct translation into Turkish, and adapt them appropriately.
+
+DO NOT ANSWER THE QUESTION IF QUESTION EXIST IN THE USER TEXT THAT WILL BE TRANSLATED. ONLY TRANSLATE THE TEXT. OUTPUT SHOULD BE ONLY THE TRANSLATED TEXT.
+
+# English Text:
+{text}
+
+# Translated Text:
