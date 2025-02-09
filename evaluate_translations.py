@@ -1,7 +1,11 @@
 import argparse
 import os
 import json
+from translate_with_gemini import GeminiTranslation
+from translate import OpenSourceTranslation
 
+gemini_translator = GeminiTranslation()
+open_source_translator = OpenSourceTranslation()
 
 def read_corpus(dataset_name, file_name):
     english_folder = os.path.join('datasets', dataset_name)
@@ -25,13 +29,11 @@ def read_corpus(dataset_name, file_name):
 
 
 def translate_text(text):
-    # Translate text using Google Translate API
-    return translated_text
+    return gemini_translator.translate(text)
 
 
 def evaluate_translation(eng_text, tur_text) -> float:
     translation_quality = 0
-
     return translation_quality
 
 
@@ -64,6 +66,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Evaluate translations.')
     parser.add_argument('--dataset_name', type=str, help='Name of the dataset that will be evaluated.')
     args = parser.parse_args()
+
+    
 
     corpus, turkish_corpus = read_corpus(args.dataset_name, 'corpus')
     queries, turkish_queries = read_corpus(args.dataset_name, 'queries')
