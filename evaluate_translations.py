@@ -2,10 +2,13 @@ import argparse
 import os
 import json
 from translate_with_gemini import GeminiTranslation
-from translate import OpenSourceTranslation
+#from translate import OpenSourceTranslation
+from llm_evaluation import Evaluation
+import time
 
 gemini_translator = GeminiTranslation()
-open_source_translator = OpenSourceTranslation()
+#open_source_translator = OpenSourceTranslation()
+evaluator = Evaluation()
 
 def read_corpus(dataset_name, file_name):
     english_folder = os.path.join('datasets', dataset_name)
@@ -29,15 +32,18 @@ def read_corpus(dataset_name, file_name):
 
 
 def translate_text(text):
+    print("Translation made using Gemini translation api")
     return gemini_translator.translate(text)
 
 
-def evaluate_translation(eng_text, tur_text) -> float:
-    translation_quality = 0
-    return translation_quality
+def evaluate_translation(eng_text, tur_text) -> bool:
+    response = evaluator.evaluate(eng_text, tur_text)
+    if "PASS" in response:
+        return True 
+    return False
 
 
-def evaluate_file(file, translated_file,threshold=7.0, max_retries=3):
+def evaluate_file(file, translated_file, max_retries=3):
     pass_fail_indices = []
     for i in range(len(file)):
         
@@ -47,7 +53,7 @@ def evaluate_file(file, translated_file,threshold=7.0, max_retries=3):
         translation_quality = evaluate_translation(eng_text, tur_text)
         
         retry_count = 0
-        while translation_quality < threshold and retry_count < max_retries:
+        while translation_quality is False and retry_count < max_retries:
             tur_text = translate_text(eng_text)
             translation_quality = evaluate_translation(eng_text, tur_text)
             retry_count += 1
@@ -67,19 +73,24 @@ if __name__ == '__main__':
     parser.add_argument('--dataset_name', type=str, help='Name of the dataset that will be evaluated.')
     args = parser.parse_args()
 
-    
-
     corpus, turkish_corpus = read_corpus(args.dataset_name, 'corpus')
     queries, turkish_queries = read_corpus(args.dataset_name, 'queries')
 
-    print('Corpus')
-    for i in range(len(corpus)):
-        print(f'English: {corpus[i]["text"]}')
-        print(f'Turkish: {turkish_corpus[i]["text"]}')
-        break
+    print(len(corpus))
+    print(len(queries))
 
-    print('Queries')
-    for i in range(len(queries)):
-        print(f'English: {queries[i]["text"]}')
-        print(f'Turkish: {turkish_queries[i]["text"]}')
-        break
+    # get the first 100 of corpus for test purposes
+    corpus = corpus[:100]
+    turkish_corpus = turkish_corpus[:100]
+
+    start_time = time.time()
+    pass_fail_indices = evaluate_file(corpus, turkish_corpus)
+    end_time = time.time()
+
+    total_time = end_time - start_time
+
+    print(f"Evaluations take total {total_time} second")
+
+    out_list = []
+    for i in range(len(pass_fail_indices)):
+        out_list.append({"eng_text":corpus[i], "tur_text":turkish_corpus[i], "decision":pass_fail_indices[i]})

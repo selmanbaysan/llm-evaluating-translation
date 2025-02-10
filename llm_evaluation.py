@@ -19,11 +19,4 @@ class Evaluation:
         }
         response = requests.post(self.url, json=data)
         return json.loads(response.text)['response']
-
-
-if __name__ == "__main__":
-    evaluator = Evaluation()
-    print(evaluator.evaluate("Hello, how are you?", "Merhaba, naber?"))
-
-
     
