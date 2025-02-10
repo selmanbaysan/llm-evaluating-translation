@@ -38,6 +38,7 @@ def translate_text(text):
 
 def evaluate_translation(eng_text, tur_text) -> bool:
     response = evaluator.evaluate(eng_text, tur_text)
+    print(response)
     if "PASS" in response:
         return True 
     return False
@@ -75,9 +76,6 @@ if __name__ == '__main__':
 
     corpus, turkish_corpus = read_corpus(args.dataset_name, 'corpus')
     queries, turkish_queries = read_corpus(args.dataset_name, 'queries')
-
-    print(len(corpus))
-    print(len(queries))
 
     # get the first 100 of corpus for test purposes
     corpus = corpus[:100]
