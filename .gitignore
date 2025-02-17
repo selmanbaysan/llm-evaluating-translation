@@ -2,3 +2,5 @@ env/
 datasets/
 translated_datasets/
 api_key.txt
+.idea/
+

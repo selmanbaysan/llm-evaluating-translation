@@ -40,6 +40,31 @@ def concat_evaluations(dataset, translated_dataset, evaluations):
 
     return translation_sets
 
+
+def create_sample_df(true_corpus_evaluations, false_corpus_evaluations, true_query_evaluations, false_query_evaluations):
+
+    sample_df = pd.DataFrame(columns=["english_text", "turkish_text", "translation_is_valid"])
+
+    sample_df = sample_df.append(true_corpus_evaluations.sample(n=10))
+    sample_df = sample_df.append(true_query_evaluations.sample(n=10))
+
+    # check the number of false evaluations
+    false_corpus_count = len(false_corpus_evaluations)
+    false_query_count = len(false_query_evaluations)
+
+    if false_corpus_count < 10:
+        sample_df = sample_df.append(false_corpus_evaluations)
+    else:
+        sample_df = sample_df.append(false_corpus_evaluations.sample(n=10))
+
+    if false_query_count < 10:
+        sample_df = sample_df.append(false_query_evaluations)
+    else:
+        sample_df = sample_df.append(false_query_evaluations.sample(n=10))
+
+    return sample_df
+
+
 def create_sample(dataset_name):
     corpus, turkish_corpus = read_corpus(dataset_name, 'corpus')
     queries, turkish_queries = read_corpus(dataset_name, 'queries')
@@ -54,18 +79,12 @@ def create_sample(dataset_name):
     query_evaluations_df = pd.DataFrame(concatted_query_evaluations)
 
     true_corpus_evaluations = corpus_evaluations_df[corpus_evaluations_df["translation_is_valid"] == True]
-    false_corpus_evaluations =corpus_evaluations_df[corpus_evaluations_df["translation_is_valid"] == False]
-
-    a = true_corpus_evaluations.sample(5, replace=True)
-    b = false_corpus_evaluations.sample(5, replace=True)
+    false_corpus_evaluations = corpus_evaluations_df[corpus_evaluations_df["translation_is_valid"] == False]
 
     true_query_evaluations = query_evaluations_df[query_evaluations_df["translation_is_valid"] == True]
     false_query_evaluations =query_evaluations_df[query_evaluations_df["translation_is_valid"] == False]
-    
-    c = true_query_evaluations.sample(5, replace=True)
-    d = false_query_evaluations.sample(5, replace=True)
 
-    sample_df = pd.concat([a, b, c, d])
+    sample_df = create_sample_df(true_corpus_evaluations, false_corpus_evaluations, true_query_evaluations, false_query_evaluations)
 
     return sample_df
 
@@ -75,13 +94,21 @@ if __name__ == '__main__':
     
     os.makedirs(OUTPUT_PATH, exist_ok=True)
 
+    df_list = []
     for dataset in datasets:
         sample_df = create_sample(dataset)
+        df_list.append(sample_df)
         if dataset == "cqadupstack/gaming":
             dataset = "cqadupstack_gaming"
 
         sample_df.to_csv(f"{OUTPUT_PATH}/{dataset}.csv")
-    
+
+    combined_df = pd.concat(df_list)
+
+    for idx, row in combined_df.iterrows():
+        with open(f"{os.path.join(OUTPUT_PATH, "human_evaluation_samples")}/{idx}.json", "w", encoding="utf-8") as f:
+            json.dump(row.to_dict(), f, indent=4, ensure_ascii=False)
+
 
 
 
