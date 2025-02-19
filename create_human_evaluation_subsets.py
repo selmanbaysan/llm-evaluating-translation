@@ -26,7 +26,7 @@ def read_corpus(dataset_name, file_name):
 
 def read_evaluations(dataset_name, file_name):
 
-    evaluation_folder = os.path.join("llm_evaluations", dataset_name)
+    evaluation_folder = os.path.join("llm_evaluations_v2", dataset_name)
     
     with open(os.path.join(evaluation_folder, f"{file_name}_pass_fail_indices.json"), "r") as f:
         pass_fail_indices = json.load(f)
@@ -42,27 +42,34 @@ def concat_evaluations(dataset, translated_dataset, evaluations):
 
 
 def create_sample_df(true_corpus_evaluations, false_corpus_evaluations, true_query_evaluations, false_query_evaluations):
-
     sample_df = pd.DataFrame(columns=["english_text", "turkish_text", "translation_is_valid"])
 
-    sample_df = sample_df.append(true_corpus_evaluations.sample(n=10))
-    sample_df = sample_df.append(true_query_evaluations.sample(n=10))
+    sample_df = pd.concat([sample_df, true_corpus_evaluations.sample(n=5)], ignore_index=True)
+    sample_df = pd.concat([sample_df, true_query_evaluations.sample(n=5)], ignore_index=True)
+
+    sample_stats = {'true_corpus_evaluations': 5,
+                    'true_query_evaluations': 5
+                    }
 
     # check the number of false evaluations
     false_corpus_count = len(false_corpus_evaluations)
     false_query_count = len(false_query_evaluations)
 
-    if false_corpus_count < 10:
-        sample_df = sample_df.append(false_corpus_evaluations)
+    if false_corpus_count < 5:
+        sample_df = pd.concat([sample_df, false_corpus_evaluations], ignore_index=True)
+        sample_stats['false_corpus_evaluations'] = false_corpus_count
     else:
-        sample_df = sample_df.append(false_corpus_evaluations.sample(n=10))
+        sample_df = pd.concat([sample_df, false_corpus_evaluations.sample(n=5)], ignore_index=True)
+        sample_stats['false_corpus_evaluations'] = 5
 
-    if false_query_count < 10:
-        sample_df = sample_df.append(false_query_evaluations)
+    if false_query_count < 5:
+        sample_df = pd.concat([sample_df, false_query_evaluations], ignore_index=True)
+        sample_stats['false_query_evaluations'] = false_query_count
     else:
-        sample_df = sample_df.append(false_query_evaluations.sample(n=10))
+        sample_df = pd.concat([sample_df, false_query_evaluations.sample(n=5)], ignore_index=True)
+        sample_stats['false_query_evaluations'] = 5
 
-    return sample_df
+    return sample_df, sample_stats
 
 
 def create_sample(dataset_name):
@@ -84,32 +91,33 @@ def create_sample(dataset_name):
     true_query_evaluations = query_evaluations_df[query_evaluations_df["translation_is_valid"] == True]
     false_query_evaluations =query_evaluations_df[query_evaluations_df["translation_is_valid"] == False]
 
-    sample_df = create_sample_df(true_corpus_evaluations, false_corpus_evaluations, true_query_evaluations, false_query_evaluations)
+    sample_df, sample_stats = create_sample_df(true_corpus_evaluations, false_corpus_evaluations, true_query_evaluations, false_query_evaluations)
+    sample_stats["total_corpus_errors"] = len(false_corpus_evaluations)
+    sample_stats["total_query_errors"] = len(false_query_evaluations)
 
-    return sample_df
+    return sample_df, sample_stats
 
 if __name__ == '__main__':
-    OUTPUT_PATH = "evaluation_samples"
-    datasets = ["arguana", "cqadupstack/gaming", "fiqa", "nfcorpus", "scidocs", "scifact"]
+    OUTPUT_PATH = "evaluation_samples_v2"
+    datasets = ["arguana", "cqadupstack/gaming", "fiqa", "nfcorpus", "scidocs", "scifact", "quora"]
     
     os.makedirs(OUTPUT_PATH, exist_ok=True)
+    output_dir = os.path.join(OUTPUT_PATH, 'human_evaluation_samples')
+    os.makedirs(output_dir, exist_ok=True)
 
     df_list = []
     for dataset in datasets:
-        sample_df = create_sample(dataset)
+        sample_df, sample_stats = create_sample(dataset)
         df_list.append(sample_df)
         if dataset == "cqadupstack/gaming":
             dataset = "cqadupstack_gaming"
 
         sample_df.to_csv(f"{OUTPUT_PATH}/{dataset}.csv")
+        with open(f"{OUTPUT_PATH}/{dataset}_sample_stats.json", 'w') as f:
+            json.dump(sample_stats, f)
 
-    combined_df = pd.concat(df_list)
+    combined_df = pd.concat(df_list, ignore_index=True)
 
     for idx, row in combined_df.iterrows():
-        with open(f"{os.path.join(OUTPUT_PATH, "human_evaluation_samples")}/{idx}.json", "w", encoding="utf-8") as f:
-            json.dump(row.to_dict(), f, indent=4, ensure_ascii=False)
-
-
-
-
-    
+        with open(f"{output_dir}/{idx}.json", "w", encoding="utf-8") as f:
+            json.dump(row.to_dict(), f, indent=4, ensure_ascii=False)    

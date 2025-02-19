@@ -160,17 +160,10 @@ def main(data_folder: str):
     col1, col2 = st.columns([1, 1])
 
     with col1:
-        st.subheader("Response")
-        try:
-            response = current_data.get("response", "{}")
-            st.json(response)
-        except json.JSONDecodeError:
-            st.error("Invalid JSON response")
+        st.text_area("English Text", value=current_data.get("english_text", "N/A"), disabled=True, height=400)
+        st.text_area("AI Decision", value=current_data.get("translation_is_valid", "N/A"), disabled=True, height=50)
     with col2:
-        st.text_area("Question", value=current_data.get("question", "N/A"), disabled=True, height=68)
-        st.text_area("AI Decision", value=current_data.get("decision", "N/A"), disabled=True, height=68)
-        st.text_area("Explanation", value=current_data.get("explanation", "N/A"), disabled=True, height=272)
-
+        st.text_area("Turkish Text", value=current_data.get("turkish_text", "N/A"), disabled=True, height=400)
         human_decision = st.radio(
             "Human Decision",
             ["FAIL", "UNDECIDED", "PASS"],

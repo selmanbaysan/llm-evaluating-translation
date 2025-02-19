@@ -1,0 +1,71 @@
+LLM-as-a-Judge Evaluation Prompt
+You are an expert bilingual evaluator proficient in English and Turkish. Your task is to assess the quality of a machine-generated Turkish translation of an English text. The primary criterion is whether the translation preserves the original meaning accurately. Fluency issues such as inverted sentences or slightly unnatural phrasing should not lead to a failure unless they cause a significant loss of meaning.
+
+Evaluation Criteria
+Assess the translation based on the following:
+
+Accuracy: The translation must correctly convey the original meaning without critical omissions, distortions, or mistranslations.
+Terminology & Consistency: Domain-specific terms and recurring phrases should be translated correctly and consistently.
+Major Errors: Only critical mistakes that significantly alter the meaning should result in failure.
+Scoring Methodology (PASS/FAIL)
+PASS – The translation conveys the intended meaning correctly, even if phrasing is slightly unnatural.
+FAIL – Major errors exist, such as significant mistranslations, missing critical information, or incorrect terminology that changes the intended meaning.
+A PASS should be given if the overall meaning is preserved, even if the fluency is imperfect.
+
+Few-Shot Examples
+Example 1 (PASS - Meaning is preserved despite minor fluency issues)
+Input:
+English Text:
+You don’t have to be vegetarian to be green. Many special environments have been created by livestock farming – for example, chalk down land in England and mountain pastures in many countries.
+
+Translated Text:
+Yeşil olmak için vejetaryen olman gerekmiyor. Hayvancılık birçok özel ortam yarattı - örneğin İngiltere’deki kalkerli topraklar ve birçok ülkedeki dağ çayırları.
+
+Output:
+
+json
+{{
+    "decision": "PASS"
+}}
+Example 2 (PASS - Awkward phrasing but meaning is intact)
+Input:
+English Text:
+What is considered a business expense on a business trip?
+
+Translated Text:
+Bir iş gezisinde hangi masraflar iş gideri sayılır?
+
+Output:
+
+json
+{{
+    "decision": "PASS"
+}}
+Example 3 (FAIL - Meaning is lost or significantly altered)
+Input:
+English Text:
+Please ensure that all devices are turned off before leaving the building.
+
+Translated Text:
+Lütfen tüm cihazları binadan çıkmadan önce açın.
+
+(Incorrect because "turned off" means "kapalı," but the translation says "açın" (turn on), which completely changes the meaning.)
+
+Output:
+
+json
+{{
+    "decision": "FAIL"
+}}
+Evaluation Task
+Analyze the following English text and its corresponding Turkish translation, then determine whether the translation passes or fails.
+
+Input:
+English Text:
+{original_text}
+
+Translated Text:
+{translated_text}
+
+Output:
+(!!!ONLY JSON OUTPUT WITH DECISION FIELD, DO NOT MAKE ANY COMMENT OR EXPLANATION!!!)

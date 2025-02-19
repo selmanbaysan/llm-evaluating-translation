@@ -1,0 +1,6 @@
+{
+    "english_text": "I've been attempting to get powered minecarts to push an empty minecart from a break in the track.               ====R==W========          (R is for raised level & W is for wooden pressure plate)      In the track above the powered minecart comes from the left and pushes the empty minecart that is resting on W onto the track and it continues to the right. However the powered minecart _always_ gets stuck on the Wooden pressure plate and doesn't continue. How can I set this up so that the powered cart keeps pushing? I've tried using downward sloping tracks both in front of the W and after but it just keeps getting stuck.",
+    "turkish_text": "Boş bir maden arabasını bir ray boşluğundan itmek için güçlendirilmiş maden arabaları kullanmaya çalışıyorum.\n\n(R, yükseltilmiş seviyeyi ve W, ahşap basınç plakasını temsil eder)\n\nYukarıdaki raylar üzerinde, güçlendirilmiş maden arabası sol taraftan gelir ve W üzerinde dinlenen boş maden arabasını raylara iter ve sağa doğru devam eder. Ancak güçlendirilmiş maden arabası her zaman ahşap basınç plakasında takılır ve devam etmez. Güçlendirilmiş arabanın itmeye devam etmesini nasıl ayarlayabilirim? Aşağı eğimli rayları hem W'nin önünde hem de sonrasında denedim ama yine de takılmaya devam ediyor.",
+    "translation_is_valid": false,
+    "human_decision": "PASS"
+}
