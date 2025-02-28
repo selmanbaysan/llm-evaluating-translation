@@ -1,7 +1,7 @@
 import requests
 
 class GeminiTranslation:
-    def __init__(self, key_path="api_key.txt", prompt_path="prompts/translate_prompt.txt"):
+    def __init__(self, key_path="api_key_fatih.txt", prompt_path="prompts/translate_prompt.txt"):
         self.headers = {'Content-Type': 'application/json'}
         self.params = {
             'key': f"{self.read_api_key(key_path)}",
@@ -36,6 +36,6 @@ class GeminiTranslation:
             params=self.params,
             headers=self.headers,
             json=json_data,
-        )
-        return response.json()["candidates"][0]["content"]["parts"][0]["text"]
-
+        ) 
+        return response.status_code, response.json()
+    

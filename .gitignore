@@ -1,8 +1,11 @@
 env/
 datasets/
 translated_datasets/
-api_key.txt
+api_key*
 .idea/
 __pycache__/
 llm_evaluations_v2/
 evaluation_samples_v2/
+corrected_datasets/
+error_indexes/
+new_outputs/
